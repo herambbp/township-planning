@@ -1,0 +1,92 @@
+<!-- templates/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Township Feasibility Prediction API</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f7fa;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+        }
+        .container {
+            background: #fff;
+            padding: 30px 40px;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            max-width: 700px;
+            width: 90%;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+        p {
+            color: #555;
+        }
+        pre {
+            background-color: #f0f0f0;
+            padding: 15px;
+            border-radius: 8px;
+            font-size: 0.95em;
+            overflow-x: auto;
+        }
+        form {
+            margin-top: 20px;
+        }
+        input[type="text"] {
+            padding: 10px;
+            width: 80%;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+            margin-right: 10px;
+        }
+        button {
+            padding: 10px 15px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🏙️ Township Feasibility Prediction</h1>
+        <p><strong>Parameters example:</strong></p>
+        <pre>{
+    "Population": 6000000,
+    "Area (sq. km)": 500,
+    "Smart Infrastructure Score": 75,
+    "Energy Consumption": 600,
+    "Public Transport Usage": 50,
+    "Air Quality Index": 40,
+    "Education Index": 80,
+    "Healthcare Index": 75,
+    "Employment Rate": 60,
+    "Smart Grid Adoption": 65,
+    "Waste Management Score": 70,
+    "Internet Speed (Mbps)": 500,
+    "Safety Index": 65,
+    "Cost of Living Index": 80
+}</pre>
+
+        <h2>🔍 Enter City to Auto-Fill Parameters</h2>
+        <form method="POST" action="/fetch-data">
+            <input type="text" name="city" required placeholder="Enter city name">
+            <button type="submit">Predict</button>
+        </form>
+    </div>
+</body>
+</html>
