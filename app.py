@@ -20,6 +20,7 @@ voting_clf = None
 scaler = None
 label_encoder = None
 final_features = None
+city_data_global = None
 
 
 def load_models():
@@ -146,11 +147,72 @@ def predict():
         # Make prediction
         prediction, probabilities = predict_township_feasibility(data)
 
+        prompt = f"""
+> I have chosen **[Yes or No or Conditionally Fit]** as the final decision for a city’s township planning suitability.
+>
+> Now, based on this decision, generate a **clear, general justification** supported by typical urban planning parameters such as:
+>
+> * Population growth
+> * Infrastructure readiness
+> * Environmental risks
+> * Economic outlook
+> * Land availability
+> * Governance or administrative factors
+>
+> ✨ Format the response like this in html format with proper styling note that this output will be embedded inside div:
+>
+> ```
+> 🧩 Supporting Reasons:
+> - Population Growth: [e.g., High projected growth → demand for townships]
+> - Infrastructure: [e.g., Roads and utilities well-developed / underdeveloped]
+> - Environment: [e.g., Low pollution / flood-prone / unsafe zone]
+> - Economic Outlook: [e.g., Booming job sector or economic stagnation]
+> - Land Availability: [e.g., Sufficient vacant land / legal disputes]
+> - Governance: [e.g., Proactive policy support / red-tapism]
+>
+> 🧾 Final Decision: Yes / No / Conditionally Fit
+> 📌 Reason Summary: [e.g., City has strong economic and population indicators but infrastructure and land policies are weak, making it conditionally fit.]
+> ```
+
+---
+
+### 🧪 Example:
+
+If you selected `Yes` manually, then GPT would output:
+
+```
+🧩 Supporting Reasons:
+- Population Growth: High population growth indicates demand for new housing.
+- Infrastructure: Metro, roads, and power systems are expanding steadily.
+- Environment: Acceptable air quality levels, low flood risk.
+- Economic Outlook: Strong IT and service sector growth.
+- Land Availability: New townships coming up in outskirts with govt approval.
+- Governance: Smart City initiatives show strong policy support.
+
+🧾 Final Decision: Yes  
+📌 Reason Summary: The city shows readiness for township planning based on strong infrastructure, economic backing, and supportive governance policies.
+```
+
+---
+
+        {probabilities}
+        {prediction}
+        {city_data_global}
+        """
+
+        # Get Gemini's response
+        gemini_response = genai_client.models.generate_content(
+            model="gemini-2.0-flash",
+            contents=prompt
+        )
+
         # Prepare response
         response = {
             "prediction": prediction,
-            "probabilities": probabilities
+            "probabilities": probabilities,
+            "reason": gemini_response.text.strip().removeprefix("```html").removesuffix("```").strip()
         }
+        
 
         return jsonify(response), 200
 
@@ -310,6 +372,7 @@ Example Guidance:
         
         data = clean_gemini_response(gemini_response.text);
         city_data = json.loads(data)
+        city_data_global = city_data
     except json.JSONDecodeError:
         return "Gemini didn't return valid JSON. Try again." + gemini_response.text, 500
 
